@@ -1,0 +1,29 @@
+{
+  "name": "sb-sl7",
+  "version": "2.0.11",
+  "target": "es5",
+  "description": "Library for easy Access to Stuctured Messages like HL7-Messages used in Health communication",
+  "main": "dist/main.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "tsc",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sourceblock-ug/sb-sl7.git"
+  },
+  "author": "Alexander Drexler (adr@sourceblock.de)",
+  "license": "LGPL-3.0-or-later",
+  "devDependencies": {
+    "@types/node": "^17.0.14",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "iconv-lite": "^0.6.3"
+  }
+}
