@@ -1,8 +1,8 @@
 # sb-sl7
-Library for easy Access to Stuctured Messages like HL7-Messages used in Health communication
+Library for easy access to information inside a text-messae, like HL7-Messages used in Health communication.
 
 This Project is a typescript migration from our internal repository.
-We decided to published it under the GPL-v3 during the rad-on-fhir - Project. 
+We decided to published it under the LGPL-v3 during the rad-on-fhir - Project. 
 
 Documentation is still mostly missing - please see the Example below.
 
