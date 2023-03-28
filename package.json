@@ -1,5 +1,5 @@
 {
-  "name": "sb-sl7",
+  "name": "@sourceblock-ug/sb-sl7",
   "version": "2.0.11",
   "target": "es5",
   "description": "Library for easy Access to Stuctured Messages like HL7-Messages used in Health communication",
@@ -16,6 +16,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/sourceblock-ug/sb-sl7.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "author": "Alexander Drexler (adr@sourceblock.de)",
   "license": "LGPL-3.0-or-later",
