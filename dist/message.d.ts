@@ -4,7 +4,7 @@ import { Part } from "./part";
 export declare class Message extends Structure<Part> {
     private messageChars;
     private msgRuleSet;
-    constructor(content: string | Date | Object);
+    constructor(content?: string | Date | Object);
     getMessageChars(idx?: number): string;
     parse(content: string | Date | Object, parent?: Structure<any> | number): void;
     private static encodingPreFlight;

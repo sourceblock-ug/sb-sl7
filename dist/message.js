@@ -20,7 +20,7 @@ class Message extends structure_1.Structure {
             this.parse(content, undefined);
         }
         else {
-            this.addPart(new part_1.Part("MSH|"));
+            this.addPart(new part_1.Part("MSH" + this.messageChars));
         }
     }
     getMessageChars(idx) {

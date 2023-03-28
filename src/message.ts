@@ -6,14 +6,14 @@ export class Message extends Structure<Part> {
     private messageChars : string = "|^~\\&"
     private msgRuleSet : RuleSet | null = null
 
-    constructor(content: string | Date | Object) {
+    constructor(content?: string | Date | Object) {
         super(undefined, undefined)
         if (content instanceof RuleSet) {
             this.msgRuleSet = content as RuleSet
         } else if (content!==undefined) {
             this.parse(content, undefined)
         } else {
-            this.addPart(new Part("MSH|"));
+            this.addPart(new Part("MSH" + this.messageChars));
         }
     }
 

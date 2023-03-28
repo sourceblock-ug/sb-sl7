@@ -42,4 +42,4 @@ for (let i = 1; i < 12; i++) {
     console.log(key + " = " + sl7Msg.getString(key))
 }
 
-// TODO: Add proper tests here... sry ;)
+// propper Testing will be added step by step
