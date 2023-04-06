@@ -18,7 +18,7 @@
     "url": "https://github.com/sourceblock-ug/sb-sl7.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org/"
   },
   "author": "Alexander Drexler (adr@sourceblock.de)",
   "license": "LGPL-3.0-or-later",
