@@ -28,6 +28,13 @@ export class SubComponent extends Structure<SubComponent> {
     }
 
 
+    isEmpty(): boolean {
+        if (this.content === undefined || this.content === null) {
+            return super.isEmpty();
+        }
+        return this.content.length === 0
+    }
+
     parse(content: string | Date | Object, parent?: Structure<any> | number) {
         if (parent!==undefined && parent instanceof Structure) {
             this.setParent(parent);

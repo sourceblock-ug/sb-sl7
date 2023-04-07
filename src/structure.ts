@@ -260,6 +260,10 @@ export abstract class Structure<T extends Structure<any>> {
         return this.get(selector) !== null
     }
 
+    public isEmpty(): boolean {
+        return this.children.length === 0 || (this.children.length === 1 && this.children[0].isEmpty());
+    }
+
     public getString (selector : string | Array<string> ) :string {
         const r : Structure<any> | null = this.get(selector)
         if (r !== null ) return r.render()
