@@ -31,6 +31,7 @@ export declare abstract class Structure<T extends Structure<any>> {
     get(selector: string | Array<string>): Structure<any> | null;
     has(selector: string | Array<string>): boolean;
     isEmpty(): boolean;
+    equals(value: null | undefined | Structure<any> | string): boolean;
     getString(selector: string | Array<string>): string;
     set(selector: string | Array<string>, content: string | Date | Object): void;
     static escapeSpecial(str: string): string;

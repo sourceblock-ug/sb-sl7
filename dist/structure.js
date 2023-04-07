@@ -236,6 +236,15 @@ class Structure {
     isEmpty() {
         return this.children.length === 0 || (this.children.length === 1 && this.children[0].isEmpty());
     }
+    equals(value) {
+        if (value === null || value === undefined) {
+            return false;
+        }
+        if (typeof value === "string") {
+            return this.render() === value;
+        }
+        return this.render() === value.render();
+    }
     getString(selector) {
         const r = this.get(selector);
         if (r !== null)

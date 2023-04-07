@@ -264,6 +264,16 @@ export abstract class Structure<T extends Structure<any>> {
         return this.children.length === 0 || (this.children.length === 1 && this.children[0].isEmpty());
     }
 
+    public equals(value: null | undefined  | Structure<any> | string) {
+        if (value === null || value === undefined) {
+            return false
+        }
+        if (typeof value === "string") {
+            return this.render() === value;
+        }
+        return this.render() === value.render();
+    }
+
     public getString (selector : string | Array<string> ) :string {
         const r : Structure<any> | null = this.get(selector)
         if (r !== null ) return r.render()

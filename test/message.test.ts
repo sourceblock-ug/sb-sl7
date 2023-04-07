@@ -1,5 +1,6 @@
 import {Message} from "../src/message";
 import {expect} from "chai";
+import {Part} from "../src/part";
 
 describe("Test Message Parsing", () => {
     it('should have Message Chars on new Element', () => {
@@ -37,4 +38,23 @@ describe("Test Message Parsing", () => {
         expect(msg2.get("NTE-2[4]")?.isEmpty()).to.eq(true);
         expect(msg2.get("NTE-2[40]")?.isEmpty()).to.eq(true);
     });
+
+
+    it('should respect Message Chars', () => {
+        const msg = new Message();
+        msg.addPart(new Part("NTE"));
+        msg.set("NTE-1.1", "B");
+        msg.set("NTE-1.2.3", "Note 1");
+        msg.set("NTE-1[2].1", "C");
+        msg.set("NTE-1[2].2", "Note 2");
+        console.log(msg.debug());
+        expect(msg.get("NTE-1.2.3")?.equals("Note 1")).to.eq(true);
+        expect(msg.get("NTE-1[2].2")?.equals("Note 2")).to.eq(true);
+        expect(msg.get("NTE-1.2.3")?.equals("Note 1")).to.eq(true);
+        expect(msg.get("NTE-1[2].2")?.equals("Note 2")).to.eq(true);
+        const msg2 = new Message(msg.render());
+        expect(msg.equals(msg2)).to.eq(true);
+        expect(msg.get("NTE-1.2.3")?.equals(msg2.get("NTE-1.2.3"))).to.eq(true);
+        expect(msg.get("NTE-1.2.3")?.equals(msg2.get("NTE-1]2}.2"))).to.eq(false);
+    })
 })
