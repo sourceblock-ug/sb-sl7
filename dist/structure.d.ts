@@ -30,6 +30,7 @@ export declare abstract class Structure<T extends Structure<any>> {
     fieldForKey(key: number | string): Structure<any> | null;
     get(selector: string | Array<string>): Structure<any> | null;
     has(selector: string | Array<string>): boolean;
+    isEmpty(): boolean;
     getString(selector: string | Array<string>): string;
     set(selector: string | Array<string>, content: string | Date | Object): void;
     static escapeSpecial(str: string): string;

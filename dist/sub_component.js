@@ -23,6 +23,12 @@ class SubComponent extends structure_1.Structure {
             return "";
         }
     }
+    isEmpty() {
+        if (this.content === undefined || this.content === null) {
+            return super.isEmpty();
+        }
+        return this.content.length === 0;
+    }
     parse(content, parent) {
         if (parent !== undefined && parent instanceof structure_1.Structure) {
             this.setParent(parent);

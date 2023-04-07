@@ -233,6 +233,9 @@ class Structure {
     has(selector) {
         return this.get(selector) !== null;
     }
+    isEmpty() {
+        return this.children.length === 0 || (this.children.length === 1 && this.children[0].isEmpty());
+    }
     getString(selector) {
         const r = this.get(selector);
         if (r !== null)

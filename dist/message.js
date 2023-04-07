@@ -152,8 +152,15 @@ class Message extends structure_1.Structure {
             var isMSH = selector.toLowerCase().startsWith("msh");
             selector = selector.replace("-", ".").split(".");
             if (isMSH) {
-                // MSH Fields are one off - due to the numbering of the Seperator String!
-                selector[1] = (parseInt(selector[1]) - 1) + '';
+                if (selector[1].indexOf("[") >= 0) {
+                    const item = Math.max(0, parseInt(selector[1].substring(selector[1].indexOf("[") + 1, selector[1].indexOf("]"))));
+                    const key = selector[1].substring(0, selector[1].indexOf("["));
+                    selector[1] = (parseInt(key) - 1) + "[" + item + "]";
+                }
+                else {
+                    // MSH Fields are one off - due to the numbering of the Seperator String!
+                    selector[1] = (parseInt(selector[1]) - 1) + '';
+                }
             }
         }
         const first = selector.shift();
