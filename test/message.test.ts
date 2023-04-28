@@ -47,7 +47,6 @@ describe("Test Message Parsing", () => {
         msg.set("NTE-1.2.3", "Note 1");
         msg.set("NTE-1[2].1", "C");
         msg.set("NTE-1[2].2", "Note 2");
-        console.log(msg.debug());
         expect(msg.get("NTE-1.2.3")?.equals("Note 1")).to.eq(true);
         expect(msg.get("NTE-1[2].2")?.equals("Note 2")).to.eq(true);
         expect(msg.get("NTE-1.2.3")?.equals("Note 1")).to.eq(true);
@@ -55,6 +54,26 @@ describe("Test Message Parsing", () => {
         const msg2 = new Message(msg.render());
         expect(msg.equals(msg2)).to.eq(true);
         expect(msg.get("NTE-1.2.3")?.equals(msg2.get("NTE-1.2.3"))).to.eq(true);
-        expect(msg.get("NTE-1.2.3")?.equals(msg2.get("NTE-1]2}.2"))).to.eq(false);
+        expect(msg.get("NTE-1.2.2")?.equals(msg2.get("NTE-1[2].2"))).to.eq(false);
+    })
+
+    it('should cleanup empty segments at the end', function () {
+        const msg = new Message();
+        msg.addPart(new Part("NTE"));
+        msg.set("NTE-1.1", "B");
+        msg.set("NTE-1.2.3", "Note 1");
+        msg.set("NTE-1[3].1", "C");
+        msg.set("NTE-1[3].2", "Note 2");
+        msg.get("NTE-1[4]"); // force getting of NTE-1[3];
+        expect(msg.render()).to.eq("MSH|^~\\&|\rNTE|B^&&Note 1~~C^Note 2~\r"); // with ending "~";
+        msg.cleanup();
+        expect(msg.render()).to.eq("MSH|^~\\&|\rNTE|B^&&Note 1~~C^Note 2\r"); // with ending "~";
+        msg.get("ZZZ-18[18].19[19].2[2]");
+        expect(msg.render()).to.eq("MSH|^~\\&|\r" +
+        "NTE|B^&&Note 1~~C^Note 2\r" +
+        "ZZZ||||||||||||||||||~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^&\r");
+        msg.cleanup();
+        expect(msg.render()).to.eq("MSH|^~\\&|\rNTE|B^&&Note 1~~C^Note 2\r"); // with ending "~";
+
     })
 })

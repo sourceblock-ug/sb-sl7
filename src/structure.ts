@@ -27,7 +27,7 @@ export abstract class Structure<T extends Structure<any>> {
     }
 
     public ruleSet () : RuleSet | null {
-        if (this.parent != undefined) {
+        if (this.parent !== undefined) {
             return this.parent.ruleSet()
         }
         return null;
@@ -285,6 +285,26 @@ export abstract class Structure<T extends Structure<any>> {
         if (field!=null) {
             field.parse(content);
         }
+    }
+
+    public cleanup(): void {
+        if (this.children.length === 0) {
+            return;
+        }
+        this.children.forEach(value => value.cleanup());
+        if (this.children[this.children.length-1].isEmpty()) {
+            const lastEmptyIndex = this.lastEmptyIndex();
+            this.children.splice(lastEmptyIndex, this.children.length - lastEmptyIndex);
+        }
+    }
+
+    private lastEmptyIndex(): number {
+        for (let i = this.children.length - 1; i >= 0; i--) {
+            if (!this.children[i].isEmpty()) {
+                return i+1;
+            }
+        }
+        return 0;
     }
 
     public static escapeSpecial (str: string) {

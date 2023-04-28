@@ -34,6 +34,8 @@ export declare abstract class Structure<T extends Structure<any>> {
     equals(value: null | undefined | Structure<any> | string): boolean;
     getString(selector: string | Array<string>): string;
     set(selector: string | Array<string>, content: string | Date | Object): void;
+    cleanup(): void;
+    private lastEmptyIndex;
     static escapeSpecial(str: string): string;
     static unescapeSpecial(str: string): string;
     static dateFromStringOrNow(str?: string): Date;

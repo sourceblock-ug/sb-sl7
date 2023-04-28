@@ -22,7 +22,7 @@ class Structure {
         return rs;
     }
     ruleSet() {
-        if (this.parent != undefined) {
+        if (this.parent !== undefined) {
             return this.parent.ruleSet();
         }
         return null;
@@ -256,6 +256,24 @@ class Structure {
         if (field != null) {
             field.parse(content);
         }
+    }
+    cleanup() {
+        if (this.children.length === 0) {
+            return;
+        }
+        this.children.forEach(value => value.cleanup());
+        if (this.children[this.children.length - 1].isEmpty()) {
+            const lastEmptyIndex = this.lastEmptyIndex();
+            this.children.splice(lastEmptyIndex, this.children.length - lastEmptyIndex);
+        }
+    }
+    lastEmptyIndex() {
+        for (let i = this.children.length - 1; i >= 0; i--) {
+            if (!this.children[i].isEmpty()) {
+                return i + 1;
+            }
+        }
+        return 0;
     }
     static escapeSpecial(str) {
         return str
