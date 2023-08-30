@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 import { expect } from "chai";
 import { Message } from "../src/message";
 import { Part } from "../src/part";
@@ -80,6 +81,53 @@ describe("Message", function () {
       );
       msg.cleanup();
       expect(msg.render()).to.eq("MSH|^~\\&|\rNTE|B^&&Note 1~~C^Note 2\r"); // with ending "~";
+    });
+  });
+
+  describe("#has", function () {
+    beforeEach(function () {
+      this.msgText =
+        "MSH|^~\\&|sample|sender|sample|receiver|20230710170931||ZSH^ZSH|4711|P|2.5.1|||AL|NE||UTF8\r" +
+        "ZSH|1^Demo^C|2^omed^d|a~b~c|||5\r";
+      this.msg = new Message(this.msgText);
+    });
+
+    it("should not add a Segment", function () {
+      expect(this.msg.has("PID")).to.eq(false);
+      expect(this.msg.render()).to.eq(this.msgText);
+    });
+
+    it("should not add a Field", function () {
+      expect(this.msg.has("ZSH-44")).to.eq(false);
+      expect(this.msg.render()).to.eq(this.msgText);
+    });
+
+    it("should not add an Entry", function () {
+      expect(this.msg.has("ZSH-3[4]")).to.eq(false);
+      expect(this.msg.render()).to.eq(this.msgText);
+    });
+
+    it("should return false for missing element", function () {
+      expect(this.msg.has("ZSH-1")).to.eq(true);
+      expect(this.msg.has("ZSH-1.15")).to.eq(false);
+      expect(this.msg.has("ZSH-3[4]")).to.eq(false);
+      expect(this.msg.has("ZSH-44")).to.eq(false);
+      expect(this.msg.render()).to.eq(this.msgText);
+    });
+
+    it("should return true for existing element", function () {
+      expect(this.msg.has("ZSH-1")).to.eq(true);
+      expect(this.msg.has("ZSH-1.1")).to.eq(true);
+      expect(this.msg.has("ZSH-1.2")).to.eq(true);
+      expect(this.msg.has("ZSH-1.3")).to.eq(true);
+      expect(this.msg.has("ZSH-2")).to.eq(true);
+      expect(this.msg.has("ZSH-2.1")).to.eq(true);
+      expect(this.msg.has("ZSH-2.2")).to.eq(true);
+      expect(this.msg.has("ZSH-2.3")).to.eq(true);
+      expect(this.msg.has("ZSH-3[1]")).to.eq(true);
+      expect(this.msg.has("ZSH-3[2]")).to.eq(true);
+      expect(this.msg.has("ZSH-3[3]")).to.eq(true);
+      expect(this.msg.render()).to.eq(this.msgText);
     });
   });
 });

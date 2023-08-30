@@ -126,7 +126,7 @@ export class Message extends Structure<Part> {
     return parseParts;
   }
 
-  fieldForKey(key: number | string): Structure<any> | null {
+  fieldForKey(key: number | string, create = true): Structure<any> | null {
     let item = 0;
     if (typeof key === "string" && key.indexOf("[") >= 0) {
       item = Math.max(
@@ -138,7 +138,7 @@ export class Message extends Structure<Part> {
 
     const keyNr: number = typeof key === "string" ? parseInt(key, 10) : key;
     if (Number.isInteger(keyNr)) {
-      return this.fieldAtIndex(keyNr - 1);
+      return this.fieldAtIndex(keyNr - 1, create);
     }
     if (typeof key === "string") {
       let found = -1;
@@ -151,61 +151,52 @@ export class Message extends Structure<Part> {
           }
         }
       }
+      if (create) {
+        const part: Part = new Part(undefined, this);
+        part.type = key;
 
-      // console.error("Missing Part " + key + " in Message, adding empty one");
-      // console.trace("Missing part " + key + " were added here: ");
-      const part: Part = new Part(undefined, this);
-      part.type = key;
+        /* TODO apply Rule set, sample:
+             var ruleSet = RuleSet.getRuleSet(key);
+              if (ruleSet!=null) {
+                  ruleSet.applyRuleSet(part);
+              }
+        */
 
-      /* var ruleSet = RuleSet.getRuleSet(key);
-            if (ruleSet!=null) {
-                ruleSet.applyRuleSet(part);
-            } */
-
-      this.addChild(part);
-      return part;
+        this.addChild(part);
+        return part;
+      }
+      return null;
     }
     return null;
   }
 
-  get(selector: string | Array<string>): Structure<any> | null {
+  protected extractParts(selector: string | Array<string>) {
     if (typeof selector === "string") {
       // TODO: convert path using ruleSet!?!
       const isMSH = selector.toLowerCase().startsWith("msh");
-      selector = selector.replace("-", ".").split(".");
+      const parts = selector.replace("-", ".").split(".");
       if (isMSH) {
-        if (selector[1].indexOf("[") >= 0) {
+        if (parts[1].indexOf("[") >= 0) {
           const item = Math.max(
             0,
             parseInt(
-              selector[1].substring(
-                selector[1].indexOf("[") + 1,
-                selector[1].indexOf("]")
+              parts[1].substring(
+                parts[1].indexOf("[") + 1,
+                parts[1].indexOf("]")
               ),
               10
             )
           );
-          const key = selector[1].substring(0, selector[1].indexOf("["));
-          selector[1] = `${parseInt(key, 10) - 1}[${item}]`;
+          const key = parts[1].substring(0, parts[1].indexOf("["));
+          parts[1] = `${parseInt(key, 10) - 1}[${item}]`;
         } else {
           // MSH Fields are one off - due to the numbering of the Seperator String!
-          selector[1] = `${parseInt(selector[1], 10) - 1}`;
+          parts[1] = `${parseInt(parts[1], 10) - 1}`;
         }
       }
+      return parts;
     }
-
-    const first = selector.shift();
-
-    if (first !== undefined) {
-      const field = this.fieldForKey(first);
-      if (field != null) {
-        if (selector.length > 0) {
-          return field.get(selector);
-        }
-        return field;
-      }
-    }
-    return null;
+    return selector;
   }
 
   public debug() {

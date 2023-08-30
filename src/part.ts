@@ -75,7 +75,7 @@ export class Part extends Structure<FieldList> {
     return r;
   }
 
-  fieldForKey(key: number | string): Structure<any> | null {
+  fieldForKey(key: number | string, create = true): Structure<any> | null {
     let item = 0;
     if (typeof key === "string" && key.indexOf("[") >= 0) {
       const s = key.substring(key.indexOf("[") + 1, key.indexOf("]"));
@@ -92,9 +92,9 @@ export class Part extends Structure<FieldList> {
       if (isMsh && keyNr === 0) {
         return new SubComponent(this.joinChar(), this);
       }
-      const child = this.fieldAtIndex(keyNr - (isMsh ? 2 : 1));
+      const child = this.fieldAtIndex(keyNr - (isMsh ? 2 : 1), create);
       if (child != null) {
-        return child.fieldAtIndex(item);
+        return child.fieldAtIndex(item, create);
       }
     }
     return null;

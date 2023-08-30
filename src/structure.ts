@@ -224,13 +224,23 @@ export abstract class Structure<T extends Structure<any>> {
     return 0;
   }
 
-  public fieldAtIndex(index: number): T {
-    while (this.children.length <= index) {
-      const items = this.createChildStructure(undefined);
-      this.children.push(items);
-      items.setParent(this);
+  public fieldAtIndex(index: number, create = false): T | null {
+    if (create) {
+      while (this.children.length <= index) {
+        const items = this.createChildStructure(undefined);
+        this.children.push(items);
+        items.setParent(this);
+      }
     }
-    return this.children[index];
+    return this.children.length > index ? this.children[index] : null;
+  }
+
+  /**
+   * @deprecated
+   * @param index
+   */
+  public fieldAtIndexIfExists(index: number): T | null {
+    return this.fieldAtIndex(index, false);
   }
 
   public key(): string {
@@ -245,21 +255,26 @@ export abstract class Structure<T extends Structure<any>> {
     return r;
   }
 
-  public fieldForKey(key: number | string): Structure<any> | null {
+  public fieldForKey(
+    key: number | string,
+    create = true
+  ): Structure<any> | null {
     const keyNr: number = typeof key === "string" ? parseInt(key, 10) : key;
     if (Number.isInteger(keyNr)) {
-      return this.fieldAtIndex(keyNr - 1);
+      return this.fieldAtIndex(keyNr - 1, create);
     }
     return null;
   }
 
-  public get(selector: string | Array<string>): Structure<any> | null {
+  protected extractParts(selector: string | Array<string>) {
     // TODO: convert path using ruleSet!?!
-    const parts: string[] =
-      typeof selector === "string"
-        ? selector.replace("\\-", ".").split(".")
-        : selector;
+    return typeof selector === "string"
+      ? selector.replace("\\-", ".").split(".")
+      : selector;
+  }
 
+  public get(selector: string | Array<string>): Structure<any> | null {
+    const parts = this.extractParts(selector);
     const first = parts.shift();
     if (first !== undefined) {
       const field = this.fieldForKey(first);
@@ -274,7 +289,18 @@ export abstract class Structure<T extends Structure<any>> {
   }
 
   public has(selector: string | Array<string>): boolean {
-    return this.get(selector) !== null;
+    const parts = this.extractParts(selector);
+    const first = parts.shift();
+    if (first !== undefined) {
+      const field = this.fieldForKey(first, false);
+      if (field != null) {
+        if (parts.length > 0) {
+          return field.has(parts);
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   public isEmpty(): boolean {
