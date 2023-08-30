@@ -24,3 +24,4 @@ export declare class RuleSet {
     static addRuleSet(ruleSet: RuleSet): void;
     static getRuleSet(name: string): RuleSet;
 }
+//# sourceMappingURL=ruleset.d.ts.map

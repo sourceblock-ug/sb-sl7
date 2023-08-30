@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Structure = void 0;
+// noinspection JSUnusedGlobalSymbols
 class Structure {
     constructor(content, parent) {
         this.children = [];
@@ -15,7 +16,7 @@ class Structure {
         return this.parent;
     }
     chars() {
-        let rs = '|^~\\&';
+        let rs = "|^~\\&";
         if (this.parent !== undefined) {
             rs = this.parent.chars();
         }
@@ -34,19 +35,19 @@ class Structure {
         return this.children;
     }
     childAtIndex(idx) {
-        idx = Math.min(this.children.length, Math.max(0, idx));
-        return this.children[idx];
+        const useIdx = Math.min(this.children.length, Math.max(0, idx));
+        return this.children[useIdx];
     }
     addChild(child) {
         child.setParent(this);
         this.children.push(child);
     }
     replaceChild(child, idx) {
-        idx = Math.max(0, idx);
-        while (this.children.length <= idx) {
+        const useIdx = Math.max(0, idx);
+        while (this.children.length <= useIdx) {
             this.children.push(this.createChildStructure(undefined));
         }
-        this.children.splice(idx, 1, child);
+        this.children.splice(useIdx, 1, child);
     }
     insertChild(child, idx) {
         while (this.children.length < idx) {
@@ -64,18 +65,16 @@ class Structure {
                 // Do not Change Parent, if not passed to function
                 this.setParent(parent);
             }
-            else {
+            else if (Number.isInteger(parent)) {
                 // TODO: Lookup in Ruleset to get Number - if a String?
-                if (Number.isInteger(parent)) {
-                    parseField = parent;
-                }
+                parseField = parent;
             }
         }
         if (parseField < 0) {
-            let parts = this.parseParts(content);
+            const parts = this.parseParts(content);
             this.children = [];
-            for (let pIdx = 0; pIdx < parts.length; pIdx++) {
-                let com = this.createChildStructure(parts[pIdx]);
+            for (let pIdx = 0; pIdx < parts.length; pIdx += 1) {
+                const com = this.createChildStructure(parts[pIdx]);
                 this.children.push(com);
             }
         }
@@ -97,38 +96,36 @@ class Structure {
         const escape = this.escapeChar();
         let strContent;
         if (content instanceof Date) {
-            strContent = content.getFullYear() + "" +
-                ("0" + (content.getMonth() + 1)).slice(-2) + "" +
-                ("0" + content.getDate()).slice(-2) + "" +
-                ("0" + content.getHours()).slice(-2) + "" +
-                ("0" + content.getMinutes()).slice(-2) + "" +
-                ("0" + content.getSeconds()).slice(-2);
+            strContent = `${content.getFullYear()}${`0${content.getMonth() + 1}`.slice(-2)}${`0${content.getDate()}`.slice(-2)}${`0${content.getHours()}`.slice(-2)}${`0${content.getMinutes()}`.slice(-2)}${`0${content.getSeconds()}`.slice(-2)}`;
         }
-        else if (typeof content === 'object' && typeof content.toString === 'function') {
+        else if (typeof content === "object" &&
+            content !== null &&
+            "toString" in content &&
+            typeof content.toString === "function") {
             strContent = content.toString();
         }
         else {
-            strContent = content + "";
+            strContent = `${content}`;
         }
         let rStr = "";
         if (myChar instanceof Array) {
-            for (let mC = 0; mC < myChar.length; mC++) {
-                rStr += Structure.escapeRegExp(myChar[mC]) + "|";
+            for (let mC = 0; mC < myChar.length; mC += 1) {
+                rStr += `${Structure.escapeRegExp(myChar[mC])}|`;
             }
             rStr = rStr.substring(0, rStr.length - 1);
         }
         else {
             rStr = Structure.escapeRegExp(myChar);
         }
-        let rex = RegExp(rStr);
-        let prepare = strContent.split(rex);
+        const rex = RegExp(rStr);
+        const prepare = strContent.split(rex);
         let parts;
         if (escape != null && escape !== "") {
             parts = [];
             // Rejoin Lines ending with escape: maybe there is a better regex only version!
             let t = "";
-            for (let pIdx = 0; pIdx < prepare.length; pIdx++) {
-                let part = prepare[pIdx];
+            for (let pIdx = 0; pIdx < prepare.length; pIdx += 1) {
+                const part = prepare[pIdx];
                 t += part;
                 if (part.endsWith(escape) && !part.endsWith(escape + escape)) {
                     t = t.substring(0, t.length - 1) + myChar;
@@ -150,8 +147,11 @@ class Structure {
     render() {
         const myChar = this.joinChar();
         let str = "";
-        for (let idx = 0; idx < this.children.length; idx++) {
-            let t = (this.children[idx] instanceof Object && this.children[idx].render !== undefined) ? this.children[idx].render() : "";
+        for (let idx = 0; idx < this.children.length; idx += 1) {
+            let t = this.children[idx] instanceof Object &&
+                this.children[idx].render !== undefined
+                ? this.children[idx].render()
+                : "";
             t = this.escape(t);
             str += t + myChar;
         }
@@ -159,17 +159,17 @@ class Structure {
     }
     escape(str) {
         const escape = this.escapeChar();
-        let myChars = this.joinChar();
-        const myChar = typeof myChars === 'string' ? myChars : myChars[0];
+        const myChars = this.joinChar();
+        const myChar = typeof myChars === "string" ? myChars : myChars[0];
+        let result = str;
         if (escape !== null) {
-            str = str.replace(new RegExp(Structure.escapeRegExp(myChar)), escape + myChar);
-            if (str.endsWith(escape)) {
-                str += escape;
+            result = result.replace(new RegExp(Structure.escapeRegExp(myChar)), escape + myChar);
+            if (result.endsWith(escape)) {
+                result += escape;
             }
         }
-        return str;
+        return result;
     }
-    ;
     toString() {
         return this.render();
     }
@@ -185,13 +185,22 @@ class Structure {
     specialCharPosition() {
         return 0;
     }
-    fieldAtIndex(index) {
-        while (this.children.length <= index) {
-            let items = this.createChildStructure(undefined);
-            this.children.push(items);
-            items.setParent(this);
+    fieldAtIndex(index, create = false) {
+        if (create) {
+            while (this.children.length <= index) {
+                const items = this.createChildStructure(undefined);
+                this.children.push(items);
+                items.setParent(this);
+            }
         }
-        return this.children[index];
+        return this.children.length > index ? this.children[index] : null;
+    }
+    /**
+     * @deprecated
+     * @param index
+     */
+    fieldAtIndexIfExists(index) {
+        return this.fieldAtIndex(index, false);
     }
     key() {
         let r = "";
@@ -200,41 +209,54 @@ class Structure {
             if (r !== "") {
                 r += ".";
             }
-            r += (this.parent.children.indexOf(this) + 1);
+            r += this.parent.children.indexOf(this) + 1;
         }
         return r;
     }
-    fieldForKey(key) {
-        const keyNr = typeof key === 'string' ? parseInt(key) : key;
+    fieldForKey(key, create = true) {
+        const keyNr = typeof key === "string" ? parseInt(key, 10) : key;
         if (Number.isInteger(keyNr)) {
-            return this.fieldAtIndex(keyNr - 1);
+            return this.fieldAtIndex(keyNr - 1, create);
         }
         return null;
     }
-    get(selector) {
+    extractParts(selector) {
         // TODO: convert path using ruleSet!?!
-        const parts = typeof selector === 'string'
+        return typeof selector === "string"
             ? selector.replace("\\-", ".").split(".")
             : selector;
+    }
+    get(selector) {
+        const parts = this.extractParts(selector);
         const first = parts.shift();
         if (first !== undefined) {
-            let field = this.fieldForKey(first);
+            const field = this.fieldForKey(first);
             if (field != null) {
                 if (parts.length > 0) {
                     return field.get(parts);
                 }
-                else {
-                    return field;
-                }
+                return field;
             }
         }
         return null;
     }
     has(selector) {
-        return this.get(selector) !== null;
+        const parts = this.extractParts(selector);
+        const first = parts.shift();
+        if (first !== undefined) {
+            const field = this.fieldForKey(first, false);
+            if (field != null) {
+                if (parts.length > 0) {
+                    return field.has(parts);
+                }
+                return true;
+            }
+        }
+        return false;
     }
     isEmpty() {
-        return this.children.length === 0 || (this.children.length === 1 && this.children[0].isEmpty());
+        return (this.children.length === 0 ||
+            (this.children.length === 1 && this.children[0].isEmpty()));
     }
     equals(value) {
         if (value === null || value === undefined) {
@@ -249,10 +271,10 @@ class Structure {
         const r = this.get(selector);
         if (r !== null)
             return r.render();
-        return '';
+        return "";
     }
     set(selector, content) {
-        let field = this.get(selector);
+        const field = this.get(selector);
         if (field != null) {
             field.parse(content);
         }
@@ -261,14 +283,14 @@ class Structure {
         if (this.children.length === 0) {
             return;
         }
-        this.children.forEach(value => value.cleanup());
+        this.children.forEach((value) => value.cleanup());
         if (this.children[this.children.length - 1].isEmpty()) {
             const lastEmptyIndex = this.lastEmptyIndex();
             this.children.splice(lastEmptyIndex, this.children.length - lastEmptyIndex);
         }
     }
     lastEmptyIndex() {
-        for (let i = this.children.length - 1; i >= 0; i--) {
+        for (let i = this.children.length - 1; i >= 0; i -= 1) {
             if (!this.children[i].isEmpty()) {
                 return i + 1;
             }
@@ -295,7 +317,7 @@ class Structure {
     }
     static dateFromStringOrNow(str) {
         if (str !== undefined && str !== "" && str.length >= 14) {
-            return new Date(parseInt(str.substring(0, 4)), parseInt(str.substring(4, 4 + 2)), parseInt(str.substring(6, 6 + 2)), parseInt(str.substring(8, 8 + 2)), parseInt(str.substring(10, 10 + 2)), parseInt(str.substring(12, 12 + 2)));
+            return new Date(parseInt(str.substring(0, 4), 10), parseInt(str.substring(4, 4 + 2), 10), parseInt(str.substring(6, 6 + 2), 10), parseInt(str.substring(8, 8 + 2), 10), parseInt(str.substring(10, 10 + 2), 10), parseInt(str.substring(12, 12 + 2), 10));
         }
         return new Date();
     }
@@ -306,7 +328,7 @@ class Structure {
      * taken from https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
      */
     static escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
     }
 }
 exports.Structure = Structure;

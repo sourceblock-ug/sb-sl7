@@ -1,8 +1,8 @@
-import { RuleSet } from "./ruleset";
+import type { RuleSet } from "./ruleset";
 export declare abstract class Structure<T extends Structure<any>> {
     protected parent?: Structure<any>;
     protected children: T[];
-    constructor(content?: string | Date | Object, parent?: Structure<any>);
+    constructor(content?: string | Date | unknown, parent?: Structure<any>);
     setParent(parent?: Structure<any>): void;
     getParent(): Structure<any> | undefined;
     chars(): string;
@@ -14,8 +14,8 @@ export declare abstract class Structure<T extends Structure<any>> {
     replaceChild(child: T, idx: number): void;
     insertChild(child: T, idx: number): void;
     getChildIndexOf(child: T): number;
-    parse(content: string | Date | Object, parent?: Structure<any> | number): void;
-    parseParts(content: string | Date | Object): string[];
+    parse(content: string | Date | unknown, parent?: Structure<any> | number): void;
+    parseParts(content: string | Date | unknown): string[];
     removeLastJoinChar(): boolean;
     render(): string;
     escape(str: string): string;
@@ -23,17 +23,23 @@ export declare abstract class Structure<T extends Structure<any>> {
     joinChar(): string | Array<string>;
     splitChar(): string | Array<string>;
     escapeChar(): string | null;
-    protected abstract createChildStructure(content?: string | Date | Object): T;
+    protected abstract createChildStructure(content?: string | Date | unknown): T;
     specialCharPosition(): number;
-    fieldAtIndex(index: number): T;
+    fieldAtIndex(index: number, create?: boolean): T | null;
+    /**
+     * @deprecated
+     * @param index
+     */
+    fieldAtIndexIfExists(index: number): T | null;
     key(): string;
-    fieldForKey(key: number | string): Structure<any> | null;
+    fieldForKey(key: number | string, create?: boolean): Structure<any> | null;
+    protected extractParts(selector: string | Array<string>): string[];
     get(selector: string | Array<string>): Structure<any> | null;
     has(selector: string | Array<string>): boolean;
     isEmpty(): boolean;
     equals(value: null | undefined | Structure<any> | string): boolean;
     getString(selector: string | Array<string>): string;
-    set(selector: string | Array<string>, content: string | Date | Object): void;
+    set(selector: string | Array<string>, content: string | Date | unknown): void;
     cleanup(): void;
     private lastEmptyIndex;
     static escapeSpecial(str: string): string;
@@ -42,3 +48,4 @@ export declare abstract class Structure<T extends Structure<any>> {
     static charAt(chars: string, p: number): string;
     static escapeRegExp(string: string): string;
 }
+//# sourceMappingURL=structure.d.ts.map

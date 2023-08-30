@@ -16,7 +16,7 @@ class FieldList extends structure_1.Structure {
             r = this.parent.key();
             if (r !== "")
                 r += "-";
-            r += (this.parent.getChildIndexOf(this) + 1);
+            r += this.parent.getChildIndexOf(this) + 1;
         }
         return r;
     }

@@ -24,16 +24,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const iconv = __importStar(require("iconv-lite"));
-function default_1(msgBuffer, hl7Encoding) {
+function decoder(msgBuffer, hl7Encoding) {
     try {
         if (hl7Encoding.startsWith("8859/")) {
-            return iconv.decode(msgBuffer, "ISO-" + hl7Encoding.replace("/", "-"));
+            return iconv.decode(msgBuffer, `ISO-${hl7Encoding.replace("/", "-")}`);
         }
-        else if (hl7Encoding.toUpperCase() === 'UNICODE UTF-16') {
-            return iconv.decode(msgBuffer, 'UTF-16BE');
+        if (hl7Encoding.toUpperCase() === "UNICODE UTF-16") {
+            return iconv.decode(msgBuffer, "UTF-16BE");
         }
-        else if (hl7Encoding.toUpperCase() === 'ASCII') {
-            return iconv.decode(msgBuffer, 'ascii');
+        if (hl7Encoding.toUpperCase() === "ASCII") {
+            return iconv.decode(msgBuffer, "ascii");
         }
     }
     catch (e) {
@@ -41,5 +41,5 @@ function default_1(msgBuffer, hl7Encoding) {
     }
     return msgBuffer.toString(); // Fallback if encoding is not supported.
 }
-exports.default = default_1;
+exports.default = decoder;
 //# sourceMappingURL=decoder.js.map

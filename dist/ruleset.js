@@ -13,8 +13,7 @@ class RuleSet {
     position() {
         if (this._parent !== null)
             return this._parent.indexOf(this);
-        else
-            return 0; // no Parent? I am the First!
+        return 0; // no Parent? I am the First!
     }
     indexOf(child) {
         return this.children.indexOf(child);
@@ -22,25 +21,26 @@ class RuleSet {
     ruleSet(path) {
         if (path === undefined || path == null || path === "")
             return this;
-        const pathNr = typeof path === 'string' ? parseInt(path) : path;
+        const pathNr = typeof path === "string" ? parseInt(path, 10) : path;
         if (Number.isInteger(pathNr)) {
             return this.getChild(pathNr);
         }
-        if (typeof path === 'string' && path.indexOf(".") >= 0) {
+        if (typeof path === "string" && path.indexOf(".") >= 0) {
             try {
-                const pos = parseInt(path.substring(0, path.indexOf(".")));
+                const pos = parseInt(path.substring(0, path.indexOf(".")), 10);
                 return this.getChild(pos).ruleSet(path.substring(path.indexOf(".") + 1));
             }
-            catch (ignored) { }
+            catch (ignored) {
+                // ignore the Error
+            }
         }
-        return new RuleSet("Unknown " + path, "", "1+");
+        return new RuleSet(`Unknown ${path}`, "", "1+");
     }
     getChild(path) {
         if (path > 0 && path < this.children.length) {
             return this.children[path];
         }
-        else
-            return new RuleSet("Unknown " + path, "", "1+");
+        return new RuleSet(`Unknown ${path}`, "", "1+");
     }
     setParent(value) {
         this._parent = value;
@@ -85,14 +85,8 @@ class RuleSet {
         this._desc = value;
     }
     cloneRuleSet(name, desc, anz) {
-        if (name === undefined || name == null || name === "")
-            name = this._name;
-        if (desc === undefined || desc == null || desc === "")
-            desc = this._desc;
-        if (anz === undefined || anz == null || anz === "")
-            anz = this._anz;
-        var copy = new RuleSet(name, desc, anz);
-        this.children.forEach(function (value) {
+        const copy = new RuleSet(name === undefined || name == null || name === "" ? this._name : name, desc === undefined || desc == null || desc === "" ? this._desc : desc, anz === undefined || anz == null || anz === "" ? this._anz : anz);
+        this.children.forEach((value) => {
             copy.addChild(value.cloneRuleSet());
         });
         return copy;

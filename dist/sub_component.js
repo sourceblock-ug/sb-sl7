@@ -5,8 +5,8 @@ const structure_1 = require("./structure");
 class SubComponent extends structure_1.Structure {
     constructor(content, parent) {
         super(undefined, undefined);
-        this.content = '';
-        if (content != undefined) {
+        this.content = "";
+        if (content !== undefined) {
             this.parse(content, parent);
         }
     }
@@ -15,13 +15,11 @@ class SubComponent extends structure_1.Structure {
             if (this.content instanceof Buffer) {
                 this.content = this.content.toString();
             }
-            return (this.content + "")
+            return `${this.content}`
                 .replace(/\n/g, "\\X0A\\")
                 .replace(/\r/g, "\\X0D\\");
         }
-        else {
-            return "";
-        }
+        return "";
     }
     isEmpty() {
         if (this.content === undefined || this.content === null) {
@@ -33,7 +31,7 @@ class SubComponent extends structure_1.Structure {
         if (parent !== undefined && parent instanceof structure_1.Structure) {
             this.setParent(parent);
         }
-        this.content = (content + "")
+        this.content = `${content}`
             .replace(/\\X0A\\/g, "\n")
             .replace(/\\X0D\\/g, "\r");
     }

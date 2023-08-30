@@ -18,7 +18,7 @@ Object.defineProperty(exports, "Message", { enumerable: true, get: function () {
 const ruleset_1 = require("./ruleset");
 Object.defineProperty(exports, "RuleSet", { enumerable: true, get: function () { return ruleset_1.RuleSet; } });
 const rule_msh_1 = require("./rulesets/rule_msh");
-ruleset_1.RuleSet.addRuleSet(rule_msh_1.msh);
 const rule_adt_a08_1 = require("./rulesets/rule_adt_a08");
+ruleset_1.RuleSet.addRuleSet(rule_msh_1.msh);
 ruleset_1.RuleSet.addRuleSet(rule_adt_a08_1.adtA08);
 //# sourceMappingURL=main.js.map

@@ -20,16 +20,14 @@ class Message extends structure_1.Structure {
             this.parse(content, undefined);
         }
         else {
-            this.addPart(new part_1.Part("MSH" + this.messageChars));
+            this.addPart(new part_1.Part(`MSH${this.messageChars}`));
         }
     }
     getMessageChars(idx) {
         if (idx === undefined || idx < 0 || idx > 4) {
             return this.messageChars;
         }
-        else {
-            return this.messageChars.substring(idx, idx + 1);
-        }
+        return this.messageChars.substring(idx, idx + 1);
     }
     parse(content, parent) {
         if (content instanceof Buffer) {
@@ -48,15 +46,15 @@ class Message extends structure_1.Structure {
                 encoding = parts[18];
             }
             if (encoding !== null &&
-                encoding !== '' &&
-                encoding !== 'UNICODE UTF-8') {
+                encoding !== "" &&
+                encoding !== "UNICODE UTF-8") {
                 msgStr = (0, decoder_1.default)(buffer, encoding);
             }
         }
         return msgStr;
     }
     msh() {
-        for (let idx = 0; idx < this.length(); idx++) {
+        for (let idx = 0; idx < this.length(); idx += 1) {
             const part = this.childAtIndex(idx);
             if (part.type !== null && part.type.toUpperCase() === "MSH") {
                 return part;
@@ -93,89 +91,84 @@ class Message extends structure_1.Structure {
     }
     parseParts(content) {
         const parseParts = super.parseParts(content);
-        for (let i = 0; i < parseParts.length; i++) {
-            if (parseParts[i].length > 9 && parseParts[i].toUpperCase().startsWith("MSH")) {
+        for (let i = 0; i < parseParts.length; i += 1) {
+            if (parseParts[i].length > 9 &&
+                parseParts[i].toUpperCase().startsWith("MSH")) {
                 const length = 5;
                 const tc = parseParts[i].substring(3, 3 + 1);
                 let c = parseParts[i].substring(3, 3 + length);
                 if (c.indexOf(tc) > 0) {
                     // TODO:
-                    c = c.substring(0, c.indexOf(tc)) + this.messageChars.substring(c.indexOf(tc));
+                    c =
+                        c.substring(0, c.indexOf(tc)) +
+                            this.messageChars.substring(c.indexOf(tc));
                 }
                 this.messageChars = c;
                 i = parseParts.length; // abort
             }
         }
         // remove empty at the End
-        while (parseParts[parseParts.length - 1] === '') {
+        while (parseParts[parseParts.length - 1] === "") {
             parseParts.splice(parseParts.length - 1, 1);
         }
         return parseParts;
     }
-    fieldForKey(key) {
+    fieldForKey(key, create = true) {
         let item = 0;
-        if (typeof key === 'string' && key.indexOf("[") >= 0) {
-            item = Math.max(0, parseInt(key.substring(key.indexOf("[") + 1, key.indexOf("]"))) - 1);
+        if (typeof key === "string" && key.indexOf("[") >= 0) {
+            item = Math.max(0, parseInt(key.substring(key.indexOf("[") + 1, key.indexOf("]")), 10) - 1);
             key = key.substring(0, key.indexOf("["));
         }
-        const keyNr = typeof key === 'string' ? parseInt(key) : key;
+        const keyNr = typeof key === "string" ? parseInt(key, 10) : key;
         if (Number.isInteger(keyNr)) {
-            return this.fieldAtIndex(keyNr - 1);
+            return this.fieldAtIndex(keyNr - 1, create);
         }
-        else if (typeof key === 'string') {
+        if (typeof key === "string") {
             let found = -1;
-            for (var i = 0; i < this.length(); i++) {
+            for (let i = 0; i < this.length(); i += 1) {
                 const loopPart = this.childAtIndex(i);
                 if (loopPart.type.toUpperCase() === key.toUpperCase()) {
-                    found++;
+                    found += 1;
                     if (found === item) {
                         return loopPart;
                     }
                 }
             }
-            // console.error("Missing Part " + key + " in Message, adding empty one");
-            // console.trace("Missing part " + key + " were added here: ");
-            const part = new part_1.Part(undefined, this);
-            part.type = key;
-            /* var ruleSet = RuleSet.getRuleSet(key);
-            if (ruleSet!=null) {
-                ruleSet.applyRuleSet(part);
-            } */
-            this.addChild(part);
-            return part;
+            if (create) {
+                const part = new part_1.Part(undefined, this);
+                part.type = key;
+                /* TODO apply Rule set, sample:
+                     var ruleSet = RuleSet.getRuleSet(key);
+                      if (ruleSet!=null) {
+                          ruleSet.applyRuleSet(part);
+                      }
+                */
+                this.addChild(part);
+                return part;
+            }
+            return null;
         }
         return null;
     }
-    get(selector) {
+    extractParts(selector) {
         if (typeof selector === "string") {
             // TODO: convert path using ruleSet!?!
-            var isMSH = selector.toLowerCase().startsWith("msh");
-            selector = selector.replace("-", ".").split(".");
+            const isMSH = selector.toLowerCase().startsWith("msh");
+            const parts = selector.replace("-", ".").split(".");
             if (isMSH) {
-                if (selector[1].indexOf("[") >= 0) {
-                    const item = Math.max(0, parseInt(selector[1].substring(selector[1].indexOf("[") + 1, selector[1].indexOf("]"))));
-                    const key = selector[1].substring(0, selector[1].indexOf("["));
-                    selector[1] = (parseInt(key) - 1) + "[" + item + "]";
+                if (parts[1].indexOf("[") >= 0) {
+                    const item = Math.max(0, parseInt(parts[1].substring(parts[1].indexOf("[") + 1, parts[1].indexOf("]")), 10));
+                    const key = parts[1].substring(0, parts[1].indexOf("["));
+                    parts[1] = `${parseInt(key, 10) - 1}[${item}]`;
                 }
                 else {
                     // MSH Fields are one off - due to the numbering of the Seperator String!
-                    selector[1] = (parseInt(selector[1]) - 1) + '';
+                    parts[1] = `${parseInt(parts[1], 10) - 1}`;
                 }
             }
+            return parts;
         }
-        const first = selector.shift();
-        if (first !== undefined) {
-            const field = this.fieldForKey(first);
-            if (field != null) {
-                if (selector.length > 0) {
-                    return field.get(selector);
-                }
-                else {
-                    return field;
-                }
-            }
-        }
-        return null;
+        return selector;
     }
     debug() {
         return this.render().replace(/\r/g, "\n");
@@ -184,15 +177,10 @@ class Message extends structure_1.Structure {
         if (!(dt instanceof Date)) {
             dt = new Date();
         }
-        return dt.getFullYear() + "" +
-            ("0" + (dt.getMonth() + 1)).slice(-2) + "" +
-            ("0" + dt.getDate()).slice(-2) + "" +
-            ("0" + dt.getHours()).slice(-2) + "" +
-            ("0" + dt.getMinutes()).slice(-2) + "" +
-            ("0" + dt.getSeconds()).slice(-2);
+        return `${dt.getFullYear()}${`0${dt.getMonth() + 1}`.slice(-2)}${`0${dt.getDate()}`.slice(-2)}${`0${dt.getHours()}`.slice(-2)}${`0${dt.getMinutes()}`.slice(-2)}${`0${dt.getSeconds()}`.slice(-2)}`;
     }
     static createResponse(source, code, message) {
-        const msg = (source instanceof Message) ? source : new Message(source);
+        const msg = source instanceof Message ? source : new Message(source);
         code = code || "AA";
         message = message || "";
         const ack = new Message(msg.msh().render());

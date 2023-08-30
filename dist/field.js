@@ -16,7 +16,7 @@ class Field extends structure_1.Structure {
             r = this.parent.key();
             if (this.parent.length() > 1) {
                 // if there is only one Field then no extra [...] for position
-                r += "[" + (this.parent.getChildIndexOf(this) + 1) + "]";
+                r += `[${this.parent.getChildIndexOf(this) + 1}]`;
             }
         }
         return r;

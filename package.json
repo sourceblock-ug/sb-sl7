@@ -1,8 +1,8 @@
 {
   "name": "@sourceblock-ug/sb-sl7",
-  "version": "2.0.17",
+  "version": "2.0.18",
   "target": "es5",
-  "description": "Library for easy Access to Stuctured Messages like HL7-Messages used in Health communication",
+  "description": "Library for easy Access to Structured Messages like HL7-Messages used in Health communication",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "files": [

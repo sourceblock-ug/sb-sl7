@@ -9,9 +9,9 @@ msh2.addChild(new ruleset_1.RuleSet("id", "Namespace ID", "1"));
 msh2.addChild(new ruleset_1.RuleSet("uid", "Universal ID", "+"));
 msh2.addChild(new ruleset_1.RuleSet("idtype", "Universal ID Type", "+"));
 exports.msh.addChild(msh2); // 2
-exports.msh.addChild(msh2.cloneRuleSet("sFacc", "Sending Faccility", "1")); //3
-exports.msh.addChild(msh2.cloneRuleSet("rApp", "Receiving Application", "1")); //4
-exports.msh.addChild(msh2.cloneRuleSet("rFacc", "Receiving Faccility", "1")); //3
+exports.msh.addChild(msh2.cloneRuleSet("sFacc", "Sending Faccility", "1")); // 3
+exports.msh.addChild(msh2.cloneRuleSet("rApp", "Receiving Application", "1")); // 4
+exports.msh.addChild(msh2.cloneRuleSet("rFacc", "Receiving Faccility", "1")); // 3
 const dt = new ruleset_1.RuleSet("dt", "Date Time of Message", "1");
 dt.addChild(new ruleset_1.RuleSet("t", "Time", "1"));
 dt.addChild(new ruleset_1.RuleSet("precision", "Degree of Precision", "1+"));

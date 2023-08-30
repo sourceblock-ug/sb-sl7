@@ -53,4 +53,5 @@ module.exports = {
     },
     "import/extensions": [".js", ".ts", ".mjs", ".jsx", ".tsx"],
   },
+  ignorePatterns: ["node_modules/", "dist/"],
 };

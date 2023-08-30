@@ -7,8 +7,8 @@ const sub_component_1 = require("./sub_component");
 class Part extends structure_1.Structure {
     constructor(content, parent) {
         super(undefined, undefined);
-        this._type = 'MSH';
-        this._msh = new sub_component_1.SubComponent('', this);
+        this._type = "MSH";
+        this._msh = new sub_component_1.SubComponent("", this);
         if (content !== undefined) {
             this.parse(content, parent);
         }
@@ -27,7 +27,7 @@ class Part extends structure_1.Structure {
                 this._type = parsePart;
                 parseParts.splice(0, 1);
             }
-            if (this._type === 'MSH' && parsePart.length > 0) {
+            if (this._type === "MSH" && parsePart.length > 0) {
                 this._msh.parse(parseParts[0]);
                 parseParts.splice(0, 1);
             }
@@ -36,10 +36,13 @@ class Part extends structure_1.Structure {
     }
     render() {
         const str = super.render();
-        return this._type + (this._type === 'MSH' ? this.joinChar() + this._msh.render() : '') + this.joinChar() + str;
+        return (this._type +
+            (this._type === "MSH" ? this.joinChar() + this._msh.render() : "") +
+            this.joinChar() +
+            str);
     }
     key() {
-        var r = "";
+        let r = "";
         if (this.parent !== undefined) {
             r = this.parent.key();
             if (r !== "")
@@ -47,12 +50,12 @@ class Part extends structure_1.Structure {
             let found = 0;
             let p = -1;
             r += this._type;
-            for (let i = 0; i < this.parent.length(); i++) {
+            for (let i = 0; i < this.parent.length(); i += 1) {
                 const child = this.parent.childAtIndex(i);
                 if (child instanceof Part) {
                     const childField = child;
                     if (childField._type === this._type) {
-                        found++;
+                        found += 1;
                     }
                 }
                 if (child === this) {
@@ -60,39 +63,37 @@ class Part extends structure_1.Structure {
                 }
             }
             if (p > 1) {
-                r += "[" + p + "]";
+                r += `[${p}]`;
             }
         }
         return r;
     }
-    fieldForKey(key) {
+    fieldForKey(key, create = true) {
         let item = 0;
         if (typeof key === "string" && key.indexOf("[") >= 0) {
             const s = key.substring(key.indexOf("[") + 1, key.indexOf("]"));
-            item = Math.max(0, parseInt(s) - 1);
+            item = Math.max(0, parseInt(s, 10) - 1);
             key = key.substring(0, key.indexOf("["));
         }
-        const isMsh = this._type === 'MSH';
-        const keyNr = typeof key === 'string' ? parseInt(key) : key;
-        if (!isNaN(keyNr)) {
+        const isMsh = this._type === "MSH";
+        const keyNr = typeof key === "string" ? parseInt(key, 10) : key;
+        if (!Number.isNaN(keyNr)) {
             if (isMsh && keyNr === 1) {
                 return this._msh;
             }
-            else if (isMsh && keyNr === 0) {
+            if (isMsh && keyNr === 0) {
                 return new sub_component_1.SubComponent(this.joinChar(), this);
             }
-            const child = this.fieldAtIndex(keyNr - (isMsh ? 2 : 1));
+            const child = this.fieldAtIndex(keyNr - (isMsh ? 2 : 1), create);
             if (child != null) {
-                return child.fieldAtIndex(item);
+                return child.fieldAtIndex(item, create);
             }
         }
         return null;
     }
-    // @ts-ignore
     get type() {
         return this._type;
     }
-    // @ts-ignore
     set type(value) {
         if (value.length === 3) {
             this._type = value;
